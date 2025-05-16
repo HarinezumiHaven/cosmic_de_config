@@ -6,8 +6,6 @@
   imports =
     [
       ./hardware-configuration.nix
-      ./nvidia.nix
-      ./nvim.nix
       ./cosmic.nix
     ];
 
@@ -16,16 +14,8 @@
 
   # Bootloader
   time.hardwareClockInLocalTime = true;
-  boot = {
-    loader = {
-      efi = {
-        canTouchEfiVariables = true;
-      };
-      systemd-boot.enable = true;
-    };
-    kernelPackages = pkgs.linuxPackages-rt_latest;
-    supportedFilesystems = [ "ntfs" ];
-  };
+  boot.loader.grub.enable = true;
+  boot.loader.grub.device = "/dev/sda";
 
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -38,7 +28,7 @@
   networking.networkmanager.enable = true;
 
   networking.firewall.enable = true;
-  networking.firewall.allowedTCPPorts = [ 5900 ];
+  networking.firewall.allowedTCPPorts = [ 5900 5000 5800 ];
 
 
   # Set your time zone.
@@ -75,7 +65,7 @@
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.harinezumi = {
     isNormalUser = true;
-    description = "harinezumi";
+    description = "HarinezumiHaven";
     extraGroups = [ "networkmanager" "wheel" "input" "audio" "tty" "dialout" ];
   };
 
@@ -86,8 +76,9 @@
   # Allow unfree packages
   nixpkgs.config = {
     allowUnfree = true;
+    #programs.java = { enable = true; package = pkgs.oraclejre8; };
   };
-
+  
   # Swap
   swapDevices = [{
     device = "/var/lib/swapfile";
@@ -101,28 +92,46 @@
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     # programs
+    gfn-electron
+    xclicker
     neofetch
     cowsay
     git
+    vim
     firefox
     ayugram-desktop
     obs-studio
     vlc
-    filezilla
-    qbittorrent
     gdu
-    tor-browser
     kalker
-    arduino-ide
-    obsidian
     feh
     discord
     zip unzip
-    krita
     foliate
     gparted
-    modrinth-app
-    apkeditor
+    prismlauncher
+    vscode
+    ninja
+    renpy
+    krita
+    godot3
+    # STEAM
+    steam
+    steam-unwrapped
+    #steam-original
+    steam-run
+    #zulu
+    openal
+    udev
+    libglvnd
+    openjdk17
+    stdenv
+    dart
+    flutter
+    android-studio
+    mesa
+    bottles #exe files
+    osu-lazer
     # system
     home-manager
     busybox
@@ -149,6 +158,16 @@
     cargo
   ];
 
+
+  # STEAM
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
+    dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
+  };
+
+
+
   # Auto-delete generations
   nix.gc = {
     automatic = true;
@@ -168,7 +187,7 @@
   # };
 
   # List services that you want to enable:
-
+  services.tailscale.enable = true;
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
 
